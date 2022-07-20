@@ -8,36 +8,29 @@ int visited[1000][1000] = { 0, };
 int dx[4] = {-1, 0, 1, 0};
 int dy[4] = {0, -1, 0, 1};
 
-void check_fire(int w, int h, int cnt){
+void next_fire(int w, int h){
     vector<pair<int, int>> will_burn;
     int x, y, cx, cy;
 
-    for(int i = 0; i < h; i++)
-        check_board[i] = board[i];
+    for(int j = 0; j < h; j++)
+        for(int k = 0; k < w; k++)
+            if(check_board[j][k] == '*') will_burn.push_back(make_pair(j, k));
+    
+    for(pair<int, int> j: will_burn){
+        tie(x, y) = j;
 
-    for(int i = 0; i < cnt; i++){
-        for(int j = 0; j < h; j++)
-            for(int k = 0; k < w; k++)
-                if(check_board[j][k] == '*') will_burn.push_back(make_pair(j, k));
-        
-        for(pair<int, int> j: will_burn){
-            tie(x, y) = j;
-
-            for(int k = 0; k < 4; k++){
-                tie(cx, cy) = make_pair(x + dx[k], y + dy[k]);
-                if(check_board[cx][cy] == '.' and cx >= 0 and cx < h and cy >= 0 and cy < w)
-                    check_board[cx][cy] = '*';
-            }
+        for(int k = 0; k < 4; k++){
+            tie(cx, cy) = make_pair(x + dx[k], y + dy[k]);
+            if(check_board[cx][cy] == '.' and cx >= 0 and cx < h and cy >= 0 and cy < w)
+                check_board[cx][cy] = '*';
         }
-
-        will_burn.clear();
-    }  
+    }
 }
 
 int bfs(int w, int h){
     queue<tuple<int, int, int>> q;
     
-    int x, y, cx, cy, cnt;
+    int x, y, cx, cy, cnt, cur_cnt = 0;
     bool flag = true;
 
 
@@ -50,6 +43,9 @@ int bfs(int w, int h){
                 flag = false;
             }
     
+    for(int i = 0; i < h; i++)
+        check_board[i] = board[i];
+    
     // for(int i = 0; i < h; i++)
     //     cout << board[i] << endl;
     
@@ -59,7 +55,8 @@ int bfs(int w, int h){
         tie(x, y, cnt) = q.front();
         q.pop();
 
-        check_fire(w, h, cnt + 1);
+        if(cur_cnt++ < cnt + 1)
+            next_fire(w, h);
 
         // for(int i = 0; i < h; i++)
         //     cout << check_board[i] << endl;
