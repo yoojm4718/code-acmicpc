@@ -5,34 +5,40 @@ using namespace std;
 int main(){
     ios::sync_with_stdio(false); cin.tie(NULL); cout.tie(NULL);
 
-    stack<int> s1, s2, ans;
+    stack<pair<int, int>> s1, s2;
+    stack<int> ans;
+    pair<int, int> cur;
     int n, temp;
 
     cin >> n;
 
     for(int i = 0; i < n; i++){
         cin >> temp;
-        s1.push(temp);
+        s2.push(make_pair(i + 1, temp));
     }
 
-    for(int i = 1; i <= n; i++){
-        temp = s1.top();
-        s1.pop();
-        s2.push(temp);
-        while(s1.size() and temp > s1.top()){
+    while(!s2.empty()){
+        s1.push(s2.top());
+        s2.pop();
+    }
+
+    cout << "0 ";
+    cur = s1.top();
+    s2.push(cur);
+    s1.pop();
+    while(!s1.empty()){
+        if(cur.second < s1.top().second){
+            while(!s2.empty() and s2.top().second < s1.top().second) s2.pop();
+            if(s2.empty()) cout << "0 ";
+            else cout << s2.top().first << " ";
             s2.push(s1.top());
-            s1.pop();
         }
-        ans.push(s1.size());
-        while(s2.size() > i){
-            s1.push(s2.top());
-            s2.pop();
+        else {
+            s2.push(cur);
+            cout << cur.first << " ";
         }
-    }
-
-    while(ans.size()){
-        cout << ans.top() << " ";
-        ans.pop();
+        cur = s1.top();
+        s1.pop();
     }
 
     return 0;
